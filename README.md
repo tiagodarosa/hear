@@ -66,6 +66,8 @@ The approach used was to document first, creating the Swagger Doc, and then, wit
 
 When the service is running, the root address provides the Swagger UI and it's possible to interact with the service through it.
 
+For tests, the bearer token provided is the username.
+
 ## Doubts
 
 - Does it need to be multi-language?
