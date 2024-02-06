@@ -1,0 +1,380 @@
+openapi: 3.0.0
+info:
+  title: meals
+  version: "v1"
+  contact:
+    email: tiagodarosa@me.com
+servers:
+  - url: "/v1"
+tags:
+  - name: Meals
+paths:
+  /meals:
+    post:
+      operationId: logMealEntry
+      summary: Logs a new meal
+      tags:
+        - Meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateMeal"
+      responses:
+        "204":
+          description: Created
+        "400":
+          $ref: "#/components/responses/bad_request"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/not_found"
+        4XX:
+          $ref: "#/components/responses/internal_error"
+        5XX:
+          $ref: "#/components/responses/internal_error"
+      security:
+        - bearerAuth: []
+    
+    get:
+      operationId: viewMealEntries
+      summary: View all meal entries of a user
+      tags:
+        - Meals
+      parameters:
+        - in: query
+          schema:
+            type: number
+            default: 0
+          name: skip
+          description: Number of items to skip during pagination
+          required: true
+        - in: query
+          schema:
+            type: number
+            default: 100
+          name: top
+          description: Number of items to return in pagination
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/bad_request"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/not_found"
+        4XX:
+          $ref: "#/components/responses/internal_error"
+        5XX:
+          $ref: "#/components/responses/internal_error"
+      security:
+        - bearerAuth: []
+  
+  "/meals/public":
+    get:
+      operationId: viewPublicMealEntries
+      summary: View all public meal entries
+      tags:
+        - Meals
+      parameters:
+        - in: query
+          schema:
+            type: number
+            default: 0
+          name: skip
+          description: Number of items to skip during pagination
+          required: true
+        - in: query
+          schema:
+            type: number
+            default: 100
+          name: top
+          description: Number of items to return in pagination
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/bad_request"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/not_found"
+        4XX:
+          $ref: "#/components/responses/internal_error"
+        5XX:
+          $ref: "#/components/responses/internal_error"
+      security:
+        - bearerAuth: []
+  
+
+  "/meals/{mealId}":
+    put:
+      operationId: updateMealEntry
+      summary: Updates a meal entry
+      tags:
+        - Meals
+      parameters:
+        - in: path
+          schema:
+            type: string
+          name: mealId
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateMeal"
+      responses:
+        "204":
+          description: Updated
+        "400":
+          $ref: "#/components/responses/bad_request"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/not_found"
+        4XX:
+          $ref: "#/components/responses/internal_error"
+        5XX:
+          $ref: "#/components/responses/internal_error"
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: A basic auth that needs to be improved.
+  
+  schemas:
+    CreateUpdateMeal:
+      type: object
+      additionalProperties: false
+      properties:
+        occasion: 
+          $ref: "#/components/schemas/Occasion"
+        mealTime:
+          type: string
+          format: date-time
+        items:
+          $ref: "#/components/schemas/MealItem"
+        public:
+          type: boolean
+      required:
+        - "occasion"
+        - "mealTime"
+        - "items"
+        - "public"
+    
+    Meal:
+      type: object
+      additionalProperties: false
+      properties:
+        mealId: 
+          type: string
+        user:
+          type: string
+        registrationDate: 
+          type: string
+          format: date-time
+        occasion: 
+          $ref: "#/components/schemas/Occasion"
+        mealTime:
+          type: string
+          format: date-time
+        items:
+          $ref: "#/components/schemas/MealItem"
+        public:
+          type: boolean
+      required:
+        - "occasion"
+        - "mealTime"
+        - "items"
+    
+    Occasion:
+      type: string
+      enum: 
+        - "breakfast"
+        - "lunch"
+        - "dinner"
+        - "other"
+    
+    MealItem:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/Item"
+    
+    Item:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum:
+            - "beverage"
+            - "food"
+            - "other"
+        name:
+          type: string
+        portionType:
+          type: string
+        portionQuantity:
+          type: string
+      required:
+        - "type"
+        - "name"
+        - "portionType"
+        - "portionQuantity"
+
+    Error:
+      type: object
+      additionalProperties: false
+      description: Describes the error in greater detail.  This will typically be null in a production use case and should only be used for debugging purposes.
+      properties:
+        id:
+          title: identifier
+          type: string
+          maxLength: 256
+          pattern: ^.*$
+          example: 1b8cf815-bdfe-4628-a8bc-86d8e468ba43
+          description: "An id that can be used to locate this error for tracing and forensics.  The internal format of this identifier is undefined, please treat it as an opaque string."
+        message:
+          title: description
+          type: string
+          minLength: 1
+          maxLength: 4096
+          pattern: ^.*$
+          description: "A brief description of what went wrong to help with debugging.  May not appear in production releases, do not rely on the message."
+        exception:
+          type: object
+          additionalProperties: false
+          properties:
+            message:
+              title: description
+              type: string
+              minLength: 1
+              maxLength: 4096
+              pattern: ^.*$
+              description: "A brief description of what went wrong to help with debugging.  May not appear in production releases, do not rely on the message."
+            type:
+              type: string
+              pattern: ^.*$
+              maxLength: 1024
+              description: < This is the type of exception that was raised if known.
+            stack:
+              type: string
+              minLength: 0
+              maxLength: 2147483647
+              pattern: '^[\S\n\t\v ]*$'
+              description: "< This is the text that represents the frame information for this portion of the stack trace.  Note that this is language specific, and may contain any information that is relevant."
+        field_errors:
+          type: array
+          maxItems: 512
+          description: A list of validation issues that were found when processing the request.
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - location
+              - field
+              - reason
+            properties:
+              location:
+                type: string
+                description: |
+                  Location of the field:
+                    * `query` - In the query string.  The field should be the name of the query parameter or path fragment.
+                    * `body` - In the body of the request.  The field should be specified using a content type specific path (JSONPath for JSON, XMLPath for XML, etc.)
+                enum:
+                  - body
+                  - query
+              field:
+                type: string
+                maxLength: 1024
+                pattern: ^.*$
+                description: The path (content type specific) or name of the field that was incorrect.
+              reason:
+                title: description
+                type: string
+                minLength: 1
+                maxLength: 4096
+                pattern: ^.*$
+                description: The reason the field was incorrect.
+  
+  responses:
+    not_found:
+      description: The requested entity is not found or you do not have authorization to see it.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    forbidden:
+      description: The authenticated user of the API doesn't have permission.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    unauthorized:
+      description: The request requires authentication and either you are not authenticated or the provided authentication is not valid.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    internal_error:
+      description: "There was an error processing the request.  This may be a temporary issue, so a retry at a later time may succeed."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    bad_request:
+      description: The request was malformed.  Sending the same request will generally fail again.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  
+
+  parameters:
+    skip:
+      name: skip
+      description: Number of items to skip during pagination
+      in: query
+      required: true
+      schema:
+        type: number
+        default: 0
+    top:
+      name: top
+      description: Number of items to return in pagination
+      in: query
+      required: true
+      schema:
+        type: number
+        default: 100
+

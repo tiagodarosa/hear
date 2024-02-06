@@ -53,3 +53,29 @@ Yes of course, we don't expect you to know everything about our exact tech stack
 ### ⏰ How much time are you expecting me to devote to this?
 
 At Hear we highly value a work/life balance. We completely understand that you have life obligations that may limit the time you can put into this exercise. We've had candidates live code the entire thing during the technical interview as well as having a complete solution ready from the get go. We're flexible and welcome whatever contributions you have time for. And the truth is all of us have varying degrees of experience and to suggest an expected time range on this would only undermine the intentions of the exercise.
+
+# Comments
+
+Thank you for providing a home task, it makes us feel less nervous and able to show a bit more expertise in the development area! 😊
+
+Unfortunately, I'm new to Koa, so I've used a skeleton to have more speed of development. I've spent some time taking a look and it seems pretty straight forward to use, but it will require a little bit of time to update the code.
+
+I've used MongoDB as a database, there are no IP restrictions to connect to for test purposes.
+
+The approach used was to document first, creating the Swagger Doc, and then, with `openapi-typescript-codegen` all models are generated based on the Swagger Doc.
+
+When the service is running, the root address provides the Swagger UI and it's possible to interact with the service through it.
+
+## Doubts
+
+- Does it need to be multi-language?
+- Does it need a delete meal endpoint?
+- Is CORS necessary on the backend side?
+- Is it an issue to allow multiple updates or should we add an ETAG to handle concurrency to update a meal entry?
+
+## Improvements
+
+- Some small improvements are listed in the TODO comments throughout the code
+- Clear the package.json
+- Add middleware for authorization and authentication
+- Use KoaJS, keeping the SwaggerDoc
